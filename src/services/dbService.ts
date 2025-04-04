@@ -1,4 +1,3 @@
-
 import db from '../db/init.js';
 
 export interface Screenshot {
@@ -10,16 +9,24 @@ export interface Screenshot {
 }
 
 export const searchScreenshots = (query: string) => {
-  const stmt = db.prepare(`
-    SELECT * FROM screenshots 
-    WHERE searchable_tags LIKE ? 
-    OR json_extract(visual_elements, '$.ui_components') LIKE ?
-    OR json_extract(content_context, '$.topic') LIKE ?
-    OR json_extract(content_context, '$.technical_details') LIKE ?
-  `);
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT * FROM screenshots 
+      WHERE searchable_tags LIKE ? 
+      OR json_extract(visual_elements, '$.ui_components') LIKE ?
+      OR json_extract(content_context, '$.topic') LIKE ?
+      OR json_extract(content_context, '$.technical_details') LIKE ?
+    `;
 
-  const searchPattern = `%${query}%`;
-  return stmt.all(searchPattern, searchPattern, searchPattern, searchPattern);
+    const searchPattern = `%${query}%`;
+    db.all(sql, [searchPattern, searchPattern, searchPattern, searchPattern], (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(rows);
+    });
+  });
 };
 
 export const getScreenshot = (filepath: string) => {

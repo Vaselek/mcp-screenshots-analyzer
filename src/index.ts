@@ -3,7 +3,18 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { searchScreenshotsByQuery } from "./services/anthropicService.js";
 import { Screenshot } from "./services/dbService.js";
+import dotenv from 'dotenv';
+import { handleSearchScreenshot } from "./toolHandlers/handleSearchScreenshot.js";
 
+// Load environment variables
+dotenv.config();
+
+// Get API key from context if available, fallback to env variable
+const API_KEY = process?.env?.ANTHROPIC_API_KEY;
+
+if (!API_KEY) {
+  throw new Error(`ANTHROPIC_API_KEY is not set in environment variables or server context, ${API_KEY}`);
+}
 
 // Create server instance
 const server = new McpServer({
@@ -22,47 +33,7 @@ server.tool(
   {
     query: z.string().describe("Natural language query to search screenshots (e.g., 'find screenshots with blue buttons')"),
   },
-  async ({ query }) => {
-    try {
-      const results = await searchScreenshotsByQuery(query);
-
-      if (results.length === 0) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: "No screenshots found matching your query.",
-            },
-          ],
-        };
-      }
-
-      const formattedResults = results.map((screenshot: Screenshot) => {
-        return [
-          `File: ${screenshot.filepath}`
-        ].join("\n");
-      });
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Found ${results.length} matching screenshots:\n\n${formattedResults.join("\n")}`,
-          },
-        ],
-      };
-    } catch (error: any) {
-      console.error("Error searching screenshots:", error);
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Error searching screenshots: ${error?.message || 'Unknown error occurred'}`,
-          },
-        ],
-      };
-    }
-  },
+  async ({ query }) => await handleSearchScreenshot(query, API_KEY)
 );
 
 
