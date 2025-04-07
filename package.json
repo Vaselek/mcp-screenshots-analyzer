@@ -10,8 +10,6 @@
     "clean": "rm -rf build",
     "build": "npm run clean && tsc && chmod 755 build/index.js",
     "start": "node build/index.js",
-    "dev": "NODE_OPTIONS='--loader ts-node/esm' ts-node src/index.ts",
-    "ts-node": "NODE_OPTIONS='--loader ts-node/esm' ts-node"
   },
   "files": [
     "build"
@@ -23,13 +21,9 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@modelcontextprotocol/sdk": "^1.8.0",
-    "@types/better-sqlite3": "^7.6.12",
     "@types/sqlite3": "^3.1.11",
-    "better-sqlite3": "^11.9.1",
-    "chokidar": "^4.0.3",
     "dotenv": "^16.4.5",
     "express": "^5.1.0",
-    "openai": "^4.91.1",
     "sqlite3": "^5.1.7",
     "zod": "^3.24.2"
   },

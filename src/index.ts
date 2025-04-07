@@ -9,7 +9,6 @@ import { handleSearchScreenshot } from "./toolHandlers/handleSearchScreenshot.js
 // Load environment variables
 dotenv.config();
 
-// Get API key from context if available, fallback to env variable
 const API_KEY = process?.env?.ANTHROPIC_API_KEY;
 
 if (!API_KEY) {
